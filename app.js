@@ -1,14 +1,37 @@
-// import and create an express app
 const express = require('express');
-const app = express()
+const req = require('express/lib/request');
+const morgan = require('morgan');
+const app = express();
 
-// message as response
-msg = "Hello world! this is nodejs in a docker container.."
-    // create an end point of the api
-app.get('/', (req, res) => res.send(msg));
+const members = [{
+        id: 1,
+        name: 'John Doe',
+        age: 20,
+    },
+    {
+        id: 2,
+        name: 'Bob Doe',
+        age: 30,
+    },
+    {
+        id: 3,
+        name: 'Jack Doe',
+        age: 40,
+    }
+];
 
-// now run the application and start listening
-// on port 3000
-app.listen(3000, () => {
-    console.log("app running on port 3000...");
-})
+app.listen(8080, () => console.log('Server is running on port 8080'));
+
+app.use(morgan('dev'));
+
+app.get('/api/v1/members/:id', (req, res) => {
+    res.send(members[(req.params.id) - 1].name)
+});
+
+app.get('/api/v1/members', (req, res) => {
+    if (req.query.max != undefined && req.query.max > 0) {
+        res.send(members.slice(0, req.query.max))
+    } else {
+        res.send(members)
+    }
+});
